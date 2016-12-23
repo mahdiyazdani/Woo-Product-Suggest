@@ -1,0 +1,70 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Project-Id-Version: Woo Product Suggest\n"
+"POT-Creation-Date: 2016-12-07 20:42+0400\n"
+"PO-Revision-Date: 2016-12-07 20:42+0400\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.11\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-WPHeader: woo-product-suggest.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: includes/class-woo-product-suggest.php:24
+msgid "Choose a product"
+msgstr ""
+
+#: includes/class-woo-product-suggest.php:25
+msgid "Search for a product&hellip;"
+msgstr ""
+
+#: includes/class-woo-product-suggest.php:35
+msgid "Link an existing product or bundle into current product."
+msgstr ""
+
+#: includes/class-woo-product-suggest.php:41
+msgid "Custom Notice"
+msgstr ""
+
+#: includes/class-woo-product-suggest.php:42
+msgid "Custom notice will appear in single product page"
+msgstr ""
+
+#: includes/class-woo-product-suggest.php:43
+msgid "Use %link% for appending product title and link into notice content."
+msgstr ""
+
+#: includes/requirements.php:12
+msgid ""
+"Woo Product Suggest is enabled but not effective. It requires WooCommerce in "
+"order to work."
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "Woo Product Suggest"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+#. Author URI of the plugin/theme
+msgid "https://www.mypreview.one"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"Suggest and link a WooCommerce product to an existing product or bundle with "
+"custom notice."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Mahdi Yazdani"
+msgstr ""
