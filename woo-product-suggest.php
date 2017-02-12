@@ -3,7 +3,7 @@
 Plugin Name: 	Woo Product Suggest
 Plugin URI:  	https://www.mypreview.one
 Description: 	Suggest and link a WooCommerce product to an existing product or bundle with custom notice.
-Version:     	1.0
+Version:     	1.0.1
 Author:      	Mahdi Yazdani
 Author URI:  	https://www.mypreview.one
 Text Domain: 	woo-product-suggest
@@ -25,14 +25,220 @@ You should have received a copy of the GNU General Public License
 along with Woo Product Suggest. If not, see https://www.gnu.org/licenses/gpl-2.0.html.
 */
 // Prevent direct file access
-defined( 'ABSPATH' ) or exit;
-// Check the requirements of plugin (first step).
-require_once dirname( __FILE__ ) . '/includes/requirements.php';
-// WooCommerce Store Vacation Class.
-require_once dirname( __FILE__ ) . '/includes/class-woo-product-suggest.php';
-// Retrieve plugin option value(s).
-require_once dirname( __FILE__ ) . '/includes/front-end.php';
-if ( is_admin() ) :
-	$woo_product_suggest = new Woo_Product_Suggest(__FILE__);
-	load_plugin_textdomain( 'woo-product-suggest', FALSE, basename( dirname( __FILE__ ) ) . '/languages/' );
+if ( ! defined( 'ABSPATH' ) ) exit;
+if ( !class_exists( 'Woo_Product_Suggest' ) ) :
+	/**
+	 * The Woo Product Suggest - Class
+	 */
+	final class Woo_Product_Suggest {
+		private $file;
+		private static $_instance = null;
+		/**
+		 * Main Woo_Product_Suggest instance
+		 *
+		 * Ensures only one instance of Woo_Product_Suggest is loaded or can be loaded.
+		 *
+		 * @since 1.0.1
+		 */
+		public static function instance()
+
+		{
+			if (is_null(self::$_instance)) self::$_instance = new self();
+			return self::$_instance;
+		}
+		/**
+		 * Setup class.
+		 *
+		 * @since 1.0.1
+		 */
+		public function __construct() {
+			$this->file = plugin_basename(__FILE__);
+			add_action( 'init', array( $this, 'textdomain' ), 10 );
+			add_action( 'admin_notices', array( $this, 'activation' ), 10 );
+			add_action( 'woocommerce_product_write_panel_tabs', array( $this, 'suggest_tab' ), 10 );
+			add_action( 'woocommerce_product_data_panels', array( $this, 'suggest_tab_fields' ), 10 );
+			add_action( 'woocommerce_process_product_meta', array( $this, 'suggest_tab_fields_save' ), 10, 1 );
+			add_action( 'admin_head', array( $this, 'suggest_stylesheet' ), 10);
+			add_action( 'woocommerce_single_product_summary', array( $this, 'output_suggest_notice' ), 10 );
+			add_filter( 'plugin_action_links_' . plugin_basename( $this->file ), array( $this, 'additional_links' ), 10, 1 );
+		}
+		/**
+		 * Cloning instances of this class is forbidden.
+		 *
+		 * @since 1.0.1
+		 */
+		public function __clone()
+
+		{
+			_doing_it_wrong(__FUNCTION__, __('Cloning instances of this class is forbidden.', 'woo-product-suggest') , '1.0.1');
+		}
+		/**
+		 * Unserializing instances of this class is forbidden.
+		 *
+		 * @since 1.0.1
+		 */
+		public function __wakeup()
+
+		{
+			_doing_it_wrong(__FUNCTION__, __('Unserializing instances of this class is forbidden.', 'woo-product-suggest') , '1.0.1');
+		}
+		/**
+		 * Load languages file and text domains.
+		 *
+		 * @since 1.0.1
+		 */
+		public function textdomain()
+
+		{
+			$domain = 'woo-product-suggest';
+			$locale = apply_filters('geo_topbar_textdoamin', get_locale() , $domain);
+			load_textdomain($domain, WP_LANG_DIR . '/' . $domain . '/' . $domain . '-' . $locale . '.mo');
+			load_plugin_textdomain($domain, FALSE, dirname(plugin_basename(__FILE__)) . '/languages/');
+		}
+		/**
+		 * Query WooCommerce activation.
+		 *
+		 * @since 1.0.1
+		 */
+		public function activation()
+
+		{
+			if (!class_exists('woocommerce')):
+				$html = '<div class="notice notice-error is-dismissible">';
+				$html.= '<p>';
+				$html .= __( 'Woo Product Suggest is enabled but not effective. It requires WooCommerce in order to work.', 'woo-product-suggest' );
+				$html.= '</p>';
+				$html.= '<button type="button" class="notice-dismiss"><span class="screen-reader-text">' . __('Dismiss this notice.', 'woo-product-suggest') . '</span></button>';
+				$html.= '</div>';
+				echo $html;
+			endif;
+		}
+		/**
+		 * Register the Tab.
+		 *
+		 * @since 1.0.1
+		 */
+		public function suggest_tab() {
+			if (class_exists('woocommerce')):
+				$html = '';
+				$html .= '<li class="woo_product_suggest-tab">';
+				$html .= '<a href="#woo_product_suggest_data">';
+				$html .= __('Product Suggest', 'woo-product-suggest');
+				$html .= '</a>';
+				$html .= '</li>';
+				echo $html;
+			endif;
+		}
+		/**
+		 * Provide the corresponding tab content.
+		 *
+		 * @since 1.0.1
+		 */
+		public function suggest_tab_fields()
+
+		{
+			if (class_exists('woocommerce')):
+				global $woocommerce, $post;
+				echo '<div id="woo_product_suggest_data" class="panel woocommerce_options_panel">';
+				?>
+				<p class="form-field">
+					<label for="woo_product_suggest"><?php _e( 'Choose a product', 'woo-product-suggest' ); ?> <abbr class="required" title="required">*</abbr></label>
+					<input type="hidden" class="wc-product-search" style="width: 50%;" id="_woo_product_suggest_id" name="_woo_product_suggest_id" data-placeholder="<?php esc_attr_e( 'Search for a product&hellip;', 'woo-product-suggest' ); ?>" data-action="woocommerce_json_search_products" data-multiple="false" data-allow_clear="true" data-exclude="<?php echo intval( $post->ID ); ?>" data-selected="<?php
+						$product_id = array_filter( array_map( 'absint', (array) get_post_meta( $post->ID, '_woo_product_suggest_id', true ) ) );
+						if( ! empty($product_id) ):
+							$product = wc_get_product( $product_id[0] );
+							if ( is_object( $product ) ) :
+								$product_title = wp_kses_post( html_entity_decode( $product->get_formatted_name(), ENT_QUOTES, get_bloginfo( 'charset' ) ) );
+								echo esc_attr( $product_title );
+							endif;
+						endif;
+						
+					?>" value="<?php echo $product_id ? $product_id[0] : ''; ?>" /> <?php echo wc_help_tip( __( 'Link an existing product or bundle to current product.', 'woo-product-suggest' ) ); ?>
+				</p>
+				<?php
+					woocommerce_wp_textarea_input( 
+						array( 
+							'id'          => '_woo_product_suggest_notice', 
+							'label'       => __( 'Custom Notice', 'woo-product-suggest' ) . ' <abbr class="required" title="required">*</abbr>', 
+							'description' => __( 'Use %link% for appending product title and link to notice content.', 'woo-product-suggest' ),
+							'desc_tip'    => true
+						)
+					);
+				echo '</div><!-- End #woo_product_suggest_data -->';
+			endif;
+		}
+		/**
+		 * Saving fields values.
+		 * 
+		 * @since 1.0.1
+		 */
+		public function suggest_tab_fields_save($post_id) {
+			if (class_exists('woocommerce')):
+				$woo_product_suggest_id = isset( $_POST['_woo_product_suggest_id'] ) ? array_filter( array_map( 'intval', explode( ',', $_POST['_woo_product_suggest_id'] ) ) ) : array();
+				update_post_meta( $post_id, '_woo_product_suggest_id', $woo_product_suggest_id );
+				$woo_product_suggest_notice = isset( $_POST['_woo_product_suggest_notice'] ) ? sanitize_textarea_field($_POST['_woo_product_suggest_notice']) : '';
+				update_post_meta( $post_id, '_woo_product_suggest_notice', $woo_product_suggest_notice );
+			endif;
+		}
+		/**
+		 * Apply custom CSS to admin area.
+		 *
+		 * @since 1.0.1
+		 */
+		public function suggest_stylesheet() {
+			if (class_exists('woocommerce')):
+				echo '<style id="woo-product-suggest-stylesheet" type="text/css">
+					    .woo_product_suggest-tab a:before {
+					      content: "\f313" !important;
+					    } 
+				  	</style>';
+			endif;
+		}
+		/**
+		 * Retrieve plugin option value(s).
+		 *
+		 * @since 1.0.1
+		 */
+		public function output_suggest_notice() {
+			if (class_exists('woocommerce')):
+				global $post;
+				$output = '';
+				$woo_product_suggest_id = array_filter( array_map( 'absint', (array) get_post_meta( $post->ID, '_woo_product_suggest_id', true ) ) );
+				$woo_product_suggest_notice = esc_attr( get_post_meta( $post->ID, '_woo_product_suggest_notice', true) );
+				$woo_product_suggest_link_shortcode = '%link%';
+				if( isset($woo_product_suggest_id, $woo_product_suggest_notice) && !empty($woo_product_suggest_id) && !empty($woo_product_suggest_notice) ) :
+					if( strpos($woo_product_suggest_notice, $woo_product_suggest_link_shortcode) !== false ) :
+						$output .= str_replace( $woo_product_suggest_link_shortcode, '<a href="' . esc_url( get_permalink($woo_product_suggest_id[0]) ) . '" target="_blank">' . get_the_title( $woo_product_suggest_id[0] ) . '</a>', $woo_product_suggest_notice );
+					else:
+						$output .= $woo_product_suggest_notice;
+					endif;
+					wc_print_notice( $output, 'success' );
+				endif;
+			endif;
+		}
+		/**
+		 * Display plugin docs and support links in plugins table page.
+		 *
+		 * @since 1.0.1
+		 */
+		public function additional_links($links) {
+			// Add support link to plugin list table
+  			$plugin_links = array(
+				'<a href="https://support.mypreview.one" target="_blank">' . __('Support', 'woo-product-suggestn') . '</a>'
+			);
+  			return array_merge($plugin_links, $links);
+		}
+	}
+endif;
+/**
+ * Returns the main instance of Woo_Product_Suggest to prevent the need to use globals.
+ *
+ * @since 1.0.1
+ */
+if (!function_exists('woo_product_suggest_initialization')):
+	function woo_product_suggest_initialization()
+	{
+		return Woo_Product_Suggest::instance();
+	}
+	woo_product_suggest_initialization();
 endif;
