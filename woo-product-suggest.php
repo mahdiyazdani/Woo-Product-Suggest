@@ -10,27 +10,29 @@ Text Domain: 	woo-product-suggest
 Domain Path: 	/languages
 License:     	GPL2
 License URI: 	https://www.gnu.org/licenses/gpl-2.0.html
- 
+
 Woo Product Suggest is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 2 of the License, or
 any later version.
- 
+
 Woo Product Suggest is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
- 
+
 You should have received a copy of the GNU General Public License
 along with Woo Product Suggest. If not, see https://www.gnu.org/licenses/gpl-2.0.html.
 */
 // Prevent direct file access
-if ( ! defined( 'ABSPATH' ) ) exit;
-if ( !class_exists( 'Woo_Product_Suggest' ) ) :
+if (!defined('ABSPATH')) exit;
+if (!class_exists('Woo_Product_Suggest')):
 	/**
 	 * The Woo Product Suggest - Class
 	 */
-	final class Woo_Product_Suggest {
+	final class Woo_Product_Suggest
+
+	{
 		private $file;
 		private static $_instance = null;
 		/**
@@ -51,16 +53,42 @@ if ( !class_exists( 'Woo_Product_Suggest' ) ) :
 		 *
 		 * @since 1.0.1
 		 */
-		public function __construct() {
+		public function __construct()
+
+		{
 			$this->file = plugin_basename(__FILE__);
-			add_action( 'init', array( $this, 'textdomain' ), 10 );
-			add_action( 'admin_notices', array( $this, 'activation' ), 10 );
-			add_action( 'woocommerce_product_write_panel_tabs', array( $this, 'suggest_tab' ), 10 );
-			add_action( 'woocommerce_product_data_panels', array( $this, 'suggest_tab_fields' ), 10 );
-			add_action( 'woocommerce_process_product_meta', array( $this, 'suggest_tab_fields_save' ), 10, 1 );
-			add_action( 'admin_head', array( $this, 'suggest_stylesheet' ), 10);
-			add_action( 'woocommerce_single_product_summary', array( $this, 'output_suggest_notice' ), 10 );
-			add_filter( 'plugin_action_links_' . plugin_basename( $this->file ), array( $this, 'additional_links' ), 10, 1 );
+			add_action('init', array(
+				$this,
+				'textdomain'
+			) , 10);
+			add_action('admin_notices', array(
+				$this,
+				'activation'
+			) , 10);
+			add_action('woocommerce_product_write_panel_tabs', array(
+				$this,
+				'suggest_tab'
+			) , 10);
+			add_action('woocommerce_product_data_panels', array(
+				$this,
+				'suggest_tab_fields'
+			) , 10);
+			add_action('woocommerce_process_product_meta', array(
+				$this,
+				'suggest_tab_fields_save'
+			) , 10, 1);
+			add_action('admin_head', array(
+				$this,
+				'suggest_stylesheet'
+			) , 10);
+			add_action('woocommerce_single_product_summary', array(
+				$this,
+				'output_suggest_notice'
+			) , 10);
+			add_filter('plugin_action_links_' . plugin_basename($this->file) , array(
+				$this,
+				'additional_links'
+			) , 10, 1);
 		}
 		/**
 		 * Cloning instances of this class is forbidden.
@@ -106,7 +134,7 @@ if ( !class_exists( 'Woo_Product_Suggest' ) ) :
 			if (!class_exists('woocommerce')):
 				$html = '<div class="notice notice-error is-dismissible">';
 				$html.= '<p>';
-				$html .= __( 'Woo Product Suggest is enabled but not effective. It requires WooCommerce in order to work.', 'woo-product-suggest' );
+				$html.= __('Woo Product Suggest is enabled but not effective. It requires WooCommerce in order to work.', 'woo-product-suggest');
 				$html.= '</p>';
 				$html.= '<button type="button" class="notice-dismiss"><span class="screen-reader-text">' . __('Dismiss this notice.', 'woo-product-suggest') . '</span></button>';
 				$html.= '</div>';
@@ -118,14 +146,16 @@ if ( !class_exists( 'Woo_Product_Suggest' ) ) :
 		 *
 		 * @since 1.0.1
 		 */
-		public function suggest_tab() {
+		public function suggest_tab()
+
+		{
 			if (class_exists('woocommerce')):
 				$html = '';
-				$html .= '<li class="woo_product_suggest-tab">';
-				$html .= '<a href="#woo_product_suggest_data">';
-				$html .= __('Product Suggest', 'woo-product-suggest');
-				$html .= '</a>';
-				$html .= '</li>';
+				$html.= '<li class="woo_product_suggest-tab">';
+				$html.= '<a href="#woo_product_suggest_data">';
+				$html.= __('Product Suggest', 'woo-product-suggest');
+				$html.= '</a>';
+				$html.= '</li>';
 				echo $html;
 			endif;
 		}
@@ -142,42 +172,42 @@ if ( !class_exists( 'Woo_Product_Suggest' ) ) :
 				echo '<div id="woo_product_suggest_data" class="panel woocommerce_options_panel">';
 				?>
 				<p class="form-field">
-					<label for="woo_product_suggest"><?php _e( 'Choose a product', 'woo-product-suggest' ); ?> <abbr class="required" title="required">*</abbr></label>
-					<input type="hidden" class="wc-product-search" style="width: 50%;" id="_woo_product_suggest_id" name="_woo_product_suggest_id" data-placeholder="<?php esc_attr_e( 'Search for a product&hellip;', 'woo-product-suggest' ); ?>" data-action="woocommerce_json_search_products" data-multiple="false" data-allow_clear="true" data-exclude="<?php echo intval( $post->ID ); ?>" data-selected="<?php
-						$product_id = array_filter( array_map( 'absint', (array) get_post_meta( $post->ID, '_woo_product_suggest_id', true ) ) );
-						if( ! empty($product_id) ):
-							$product = wc_get_product( $product_id[0] );
-							if ( is_object( $product ) ) :
-								$product_title = wp_kses_post( html_entity_decode( $product->get_formatted_name(), ENT_QUOTES, get_bloginfo( 'charset' ) ) );
-								echo esc_attr( $product_title );
+					<label for="woo_product_suggest"><?php _e('Choose a product', 'woo-product-suggest'); ?> <abbr class="required" title="required">*</abbr></label>
+					<input type="hidden" class="wc-product-search" style="width: 50%;" id="_woo_product_suggest_id" name="_woo_product_suggest_id" data-placeholder="<?php esc_attr_e( 'Search for a product&hellip;', 'woo-product-suggest'); ?>" data-action="woocommerce_json_search_products" data-multiple="false" data-allow_clear="true" data-exclude="<?php echo intval( $post->ID ); ?>" data-selected="<?php
+						$product_id = array_filter( array_map( 'absint', (array) get_post_meta($post->ID, '_woo_product_suggest_id', true)));
+						if(!empty($product_id)):
+							$product = wc_get_product($product_id[0]);
+							if (is_object($product)) :
+								$product_title = wp_kses_post(html_entity_decode($product->get_formatted_name(), ENT_QUOTES, get_bloginfo('charset')));
+								echo esc_attr($product_title);
 							endif;
 						endif;
 						
 					?>" value="<?php echo $product_id ? $product_id[0] : ''; ?>" /> <?php echo wc_help_tip( __( 'Link an existing product or bundle to current product.', 'woo-product-suggest' ) ); ?>
 				</p>
 				<?php
-					woocommerce_wp_textarea_input( 
-						array( 
-							'id'          => '_woo_product_suggest_notice', 
-							'label'       => __( 'Custom Notice', 'woo-product-suggest' ) . ' <abbr class="required" title="required">*</abbr>', 
-							'description' => __( 'Use %link% for appending product title and link to notice content.', 'woo-product-suggest' ),
-							'desc_tip'    => true
-						)
-					);
+				woocommerce_wp_textarea_input(array(
+					'id' => '_woo_product_suggest_notice',
+					'label' => __('Custom Notice', 'woo-product-suggest') . ' <abbr class="required" title="required">*</abbr>',
+					'description' => __('Use %link% for appending product title and link to notice content.', 'woo-product-suggest') ,
+					'desc_tip' => true
+				));
 				echo '</div><!-- End #woo_product_suggest_data -->';
 			endif;
 		}
 		/**
 		 * Saving fields values.
-		 * 
+		 *
 		 * @since 1.0.1
 		 */
-		public function suggest_tab_fields_save($post_id) {
+		public function suggest_tab_fields_save($post_id)
+
+		{
 			if (class_exists('woocommerce')):
-				$woo_product_suggest_id = isset( $_POST['_woo_product_suggest_id'] ) ? array_filter( array_map( 'intval', explode( ',', $_POST['_woo_product_suggest_id'] ) ) ) : array();
-				update_post_meta( $post_id, '_woo_product_suggest_id', $woo_product_suggest_id );
-				$woo_product_suggest_notice = isset( $_POST['_woo_product_suggest_notice'] ) ? sanitize_textarea_field($_POST['_woo_product_suggest_notice']) : '';
-				update_post_meta( $post_id, '_woo_product_suggest_notice', $woo_product_suggest_notice );
+				$woo_product_suggest_id = isset($_POST['_woo_product_suggest_id']) ? array_filter(array_map('intval', explode(',', $_POST['_woo_product_suggest_id']))) : array();
+				update_post_meta($post_id, '_woo_product_suggest_id', $woo_product_suggest_id);
+				$woo_product_suggest_notice = isset($_POST['_woo_product_suggest_notice']) ? sanitize_textarea_field($_POST['_woo_product_suggest_notice']) : '';
+				update_post_meta($post_id, '_woo_product_suggest_notice', $woo_product_suggest_notice);
 			endif;
 		}
 		/**
@@ -185,7 +215,9 @@ if ( !class_exists( 'Woo_Product_Suggest' ) ) :
 		 *
 		 * @since 1.0.1
 		 */
-		public function suggest_stylesheet() {
+		public function suggest_stylesheet()
+
+		{
 			if (class_exists('woocommerce')):
 				echo '<style id="woo-product-suggest-stylesheet" type="text/css">
 					    .woo_product_suggest-tab a:before {
@@ -199,20 +231,22 @@ if ( !class_exists( 'Woo_Product_Suggest' ) ) :
 		 *
 		 * @since 1.0.1
 		 */
-		public function output_suggest_notice() {
+		public function output_suggest_notice()
+
+		{
 			if (class_exists('woocommerce')):
 				global $post;
 				$output = '';
-				$woo_product_suggest_id = array_filter( array_map( 'absint', (array) get_post_meta( $post->ID, '_woo_product_suggest_id', true ) ) );
-				$woo_product_suggest_notice = esc_attr( get_post_meta( $post->ID, '_woo_product_suggest_notice', true) );
+				$woo_product_suggest_id = array_filter(array_map('absint', (array)get_post_meta($post->ID, '_woo_product_suggest_id', true)));
+				$woo_product_suggest_notice = esc_attr(get_post_meta($post->ID, '_woo_product_suggest_notice', true));
 				$woo_product_suggest_link_shortcode = '%link%';
-				if( isset($woo_product_suggest_id, $woo_product_suggest_notice) && !empty($woo_product_suggest_id) && !empty($woo_product_suggest_notice) ) :
-					if( strpos($woo_product_suggest_notice, $woo_product_suggest_link_shortcode) !== false ) :
-						$output .= str_replace( $woo_product_suggest_link_shortcode, '<a href="' . esc_url( get_permalink($woo_product_suggest_id[0]) ) . '" target="_blank">' . get_the_title( $woo_product_suggest_id[0] ) . '</a>', $woo_product_suggest_notice );
+				if (isset($woo_product_suggest_id, $woo_product_suggest_notice) && !empty($woo_product_suggest_id) && !empty($woo_product_suggest_notice)):
+					if (strpos($woo_product_suggest_notice, $woo_product_suggest_link_shortcode) !== false):
+						$output.= str_replace($woo_product_suggest_link_shortcode, '<a href="' . esc_url(get_permalink($woo_product_suggest_id[0])) . '" target="_blank">' . get_the_title($woo_product_suggest_id[0]) . '</a>', $woo_product_suggest_notice);
 					else:
-						$output .= $woo_product_suggest_notice;
+						$output.= $woo_product_suggest_notice;
 					endif;
-					wc_print_notice( $output, 'success' );
+					wc_print_notice($output, 'success');
 				endif;
 			endif;
 		}
@@ -221,12 +255,14 @@ if ( !class_exists( 'Woo_Product_Suggest' ) ) :
 		 *
 		 * @since 1.0.1
 		 */
-		public function additional_links($links) {
+		public function additional_links($links)
+
+		{
 			// Add support link to plugin list table
-  			$plugin_links = array(
+			$plugin_links = array(
 				'<a href="https://support.mypreview.one" target="_blank">' . __('Support', 'woo-product-suggestn') . '</a>'
 			);
-  			return array_merge($plugin_links, $links);
+			return array_merge($plugin_links, $links);
 		}
 	}
 endif;
