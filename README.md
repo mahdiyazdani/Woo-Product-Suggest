@@ -1,4 +1,7 @@
 # Woo Product Suggest
+
+![Woo Store Vacation](https://ps.w.org/woo-product-suggest/assets/banner-1544x500.jpg?rev=1594459)
+
 There will be times when you want to sell a product that is displayed on your site, but there is another version of it available with extra add-ons or even with new and additional features in it for less price.
 
 As an example, if you are a gift card seller you may want to offer a gift card bundle in your single product page(s) and promote that package with giving extra credit to your customers! Same as what we regularly see on Amazon website.
