@@ -3,14 +3,14 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Woo Product Suggest\n"
-"POT-Creation-Date: 2017-02-12 23:14+0400\n"
+"POT-Creation-Date: 2017-10-31 13:18+0400\n"
 "PO-Revision-Date: 2017-02-12 23:13+0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.11\n"
+"X-Generator: Poedit 2.0.1\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-WPHeader: woo-product-suggest.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -20,50 +20,55 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 
-#: woo-product-suggest.php:73
+#: woo-product-suggest.php:103
 msgid "Cloning instances of this class is forbidden."
 msgstr ""
 
-#: woo-product-suggest.php:83
+#: woo-product-suggest.php:113
 msgid "Unserializing instances of this class is forbidden."
 msgstr ""
 
-#: woo-product-suggest.php:109
+#: woo-product-suggest.php:139
 msgid ""
 "Woo Product Suggest is enabled but not effective. It requires WooCommerce in "
 "order to work."
 msgstr ""
 
-#: woo-product-suggest.php:111
+#: woo-product-suggest.php:141
 msgid "Dismiss this notice."
 msgstr ""
 
-#: woo-product-suggest.php:126
+#: woo-product-suggest.php:158
 msgid "Product Suggest"
 msgstr ""
 
-#: woo-product-suggest.php:145
+#: woo-product-suggest.php:178
 msgid "Choose a product"
 msgstr ""
 
-#: woo-product-suggest.php:146
+#: woo-product-suggest.php:179
 msgid "Search for a product&hellip;"
 msgstr ""
 
-#: woo-product-suggest.php:156
+#: woo-product-suggest.php:187
 msgid "Link an existing product or bundle to current product."
 msgstr ""
 
-#: woo-product-suggest.php:162
+#: woo-product-suggest.php:192
 msgid "Custom Notice"
 msgstr ""
 
-#: woo-product-suggest.php:163
-msgid "Use %link% for appending product title and link to notice content."
+#: woo-product-suggest.php:193
+msgid "Use %link% for appending product title and link to the notice content."
 msgstr ""
 
-#: woo-product-suggest.php:227
-msgid "Support"
+#: woo-product-suggest.php:198
+msgid "Looking for a stylish theme?"
+msgstr ""
+
+#: woo-product-suggest.php:270
+#, php-format
+msgid "<a href=\"%s\" target=\"_blank\">Support</a>"
 msgstr ""
 
 #. Plugin Name of the plugin/theme
