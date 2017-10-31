@@ -1,15 +1,17 @@
 <?php
 /*
-Plugin Name: 	Woo Product Suggest
-Plugin URI:  	https://www.mypreview.one
-Description: 	Suggest and link a WooCommerce product to an existing product or bundle with custom notice.
-Version:     	1.0.1
-Author:      	Mahdi Yazdani
-Author URI:  	https://www.mypreview.one
-Text Domain: 	woo-product-suggest
-Domain Path: 	/languages
-License:     	GPL2
-License URI: 	https://www.gnu.org/licenses/gpl-2.0.html
+Plugin Name: 			Woo Product Suggest
+Plugin URI:  			https://www.mypreview.one
+Description: 			Suggest and link a WooCommerce product to an existing product or bundle with custom notice.
+Version:     			1.1.0
+Author:      			Mahdi Yazdani
+Author URI:  			https://www.mypreview.one
+Text Domain: 			woo-product-suggest
+Domain Path: 			/languages
+License:     			GPL2
+License URI: 			https://www.gnu.org/licenses/gpl-2.0.html
+WC requires at least: 	3.0.0
+WC tested up to: 		3.2.1
 
 Woo Product Suggest is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -162,49 +164,54 @@ if (!class_exists('Woo_Product_Suggest')):
 		/**
 		 * Provide the corresponding tab content.
 		 *
-		 * @since 1.0.1
+		 * @since 1.1.0
 		 */
 		public function suggest_tab_fields()
 
 		{
 			if (class_exists('woocommerce')):
 				global $woocommerce, $post;
-				echo '<div id="woo_product_suggest_data" class="panel woocommerce_options_panel">';
+				$product_id = array_filter(array_map('absint', (array)get_post_meta($post->ID, '_woo_product_suggest_id', true)));
 				?>
-				<p class="form-field">
-					<label for="woo_product_suggest"><?php _e('Choose a product', 'woo-product-suggest'); ?> <abbr class="required" title="required">*</abbr></label>
-					<input type="hidden" class="wc-product-search" style="width: 50%;" id="_woo_product_suggest_id" name="_woo_product_suggest_id" data-placeholder="<?php esc_attr_e( 'Search for a product&hellip;', 'woo-product-suggest'); ?>" data-action="woocommerce_json_search_products" data-multiple="false" data-allow_clear="true" data-exclude="<?php echo intval( $post->ID ); ?>" data-selected="<?php
-						$product_id = array_filter( array_map( 'absint', (array) get_post_meta($post->ID, '_woo_product_suggest_id', true)));
-						if(!empty($product_id)):
-							$product = wc_get_product($product_id[0]);
-							if (is_object($product)) :
-								$product_title = wp_kses_post(html_entity_decode($product->get_formatted_name(), ENT_QUOTES, get_bloginfo('charset')));
-								echo esc_attr($product_title);
-							endif;
+				<div id="woo_product_suggest_data" class="panel woocommerce_options_panel">
+					<p class="form-field">
+						<label for="woo_product_suggest"><?php _e('Choose a product', 'woo-product-suggest'); ?> <abbr class="required" title="required">*</abbr></label>
+						<select class="wc-product-search" data-multiple="false" style="width: 50%;" id="_woo_product_suggest_id" name="_woo_product_suggest_id[]" data-placeholder="<?php esc_attr_e('Search for a product&hellip;', 'woo-product-suggest'); ?>" data-action="woocommerce_json_search_products" data-allow_clear="true" data-exclude="<?php echo intval($post->ID); ?>">
+						<?php 
+						$product = wc_get_product($product_id[0]);
+						if (is_object($product)):
+							echo '<option value="' . esc_attr($product_id[0]) . '"' . selected(true, true, false) . '>' . wp_kses_post($product->get_formatted_name()) . '</option>';
 						endif;
-						
-					?>" value="<?php echo $product_id ? $product_id[0] : ''; ?>" /> <?php echo wc_help_tip( __( 'Link an existing product or bundle to current product.', 'woo-product-suggest' ) ); ?>
-				</p>
-				<?php
-				woocommerce_wp_textarea_input(array(
-					'id' => '_woo_product_suggest_notice',
-					'label' => __('Custom Notice', 'woo-product-suggest') . ' <abbr class="required" title="required">*</abbr>',
-					'description' => __('Use %link% for appending product title and link to notice content.', 'woo-product-suggest') ,
-					'desc_tip' => true
-				));
-				echo '</div><!-- End #woo_product_suggest_data -->';
+						?>
+						</select>
+						<?php echo wc_help_tip(esc_html__('Link an existing product or bundle to current product.', 'woo-product-suggest')); ?>
+					</p>
+					<?php
+					woocommerce_wp_textarea_input(array(
+						'id' => '_woo_product_suggest_notice',
+						'label' => __('Custom Notice', 'woo-product-suggest') . ' <abbr class="required" title="required">*</abbr>',
+						'description' => __('Use %link% for appending product title and link to the notice content.', 'woo-product-suggest') ,
+						'desc_tip' => true
+					));
+					?>
+					<p>
+						<label><?php esc_html_e('Looking for a stylish theme?', 'woo-product-suggest'); ?></label>
+						<p><a href="<?php echo esc_url('https://www.mypreview.one/hypermarket-plus.html'); ?>" target="_blank"><img src="<?php echo esc_url(trailingslashit(plugins_url('admin/', $this->file))); ?>/img/hypermarket-plus.png" style="max-width:100%;height:auto;" /></a></p>
+					</p>
+				</div><!-- End #woo_product_suggest_data -->
+			<?php
 			endif;
 		}
 		/**
 		 * Saving fields values.
 		 *
-		 * @since 1.0.1
+		 * @since 1.1.0
 		 */
 		public function suggest_tab_fields_save($post_id)
 
 		{
 			if (class_exists('woocommerce')):
-				$woo_product_suggest_id = isset($_POST['_woo_product_suggest_id']) ? array_filter(array_map('intval', explode(',', $_POST['_woo_product_suggest_id']))) : array();
+				$woo_product_suggest_id = isset($_POST['_woo_product_suggest_id']) ? array_filter(array_map('absint', $_POST['_woo_product_suggest_id'])) : array();
 				update_post_meta($post_id, '_woo_product_suggest_id', $woo_product_suggest_id);
 				$woo_product_suggest_notice = isset($_POST['_woo_product_suggest_notice']) ? sanitize_textarea_field($_POST['_woo_product_suggest_notice']) : '';
 				update_post_meta($post_id, '_woo_product_suggest_notice', $woo_product_suggest_notice);
@@ -229,7 +236,7 @@ if (!class_exists('Woo_Product_Suggest')):
 		/**
 		 * Retrieve plugin option value(s).
 		 *
-		 * @since 1.0.1
+		 * @since 1.1.0
 		 */
 		public function output_suggest_notice()
 
@@ -253,15 +260,14 @@ if (!class_exists('Woo_Product_Suggest')):
 		/**
 		 * Display plugin docs and support links in plugins table page.
 		 *
-		 * @since 1.0.1
+		 * @since 1.1.0
 		 */
 		public function additional_links($links)
 
 		{
 			// Add support link to plugin list table
-			$plugin_links = array(
-				'<a href="https://support.mypreview.one" target="_blank">' . __('Support', 'woo-product-suggestn') . '</a>'
-			);
+			$plugin_links = array();
+			$plugin_links[] = sprintf(__('<a href="%s" target="_blank">Support</a>', 'woo-product-suggest') , esc_url('https://support.mypreview.one/t/woo-product-suggest'));
 			return array_merge($plugin_links, $links);
 		}
 	}
