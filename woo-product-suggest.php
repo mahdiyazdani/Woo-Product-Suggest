@@ -11,7 +11,7 @@ Domain Path: 			/languages
 License:     			GPL2
 License URI: 			https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 	3.0.0
-WC tested up to: 		3.2.1
+WC tested up to: 		3.5.0
 
 Woo Product Suggest is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
