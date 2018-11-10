@@ -6,7 +6,7 @@ There will be times when you want to sell a product that is displayed on your si
 
 As an example, if you are a gift card seller you may want to offer a gift card bundle in your single product page(s) and promote that package with giving extra credit to your customers! Same as what we regularly see on Amazon website.
 
-This feature could be helpful if:
+This feature could be helpful if::
 
 * You want to promote your bundle or group product.
 * You can offer premium or pro version of an existing free or freemium product.
